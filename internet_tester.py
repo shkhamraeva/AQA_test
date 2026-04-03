@@ -2,14 +2,24 @@ from playwright.sync_api import sync_playwright
 
 URL = "https://the-internet.herokuapp.com/"
 
+def navigate_to_example(page, example_name: str) -> str:
+    page.locator(f"text={example_name}").click()
+    return page.url
+
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    browser = p.chromium.launch(headless=False)
     page = browser.new_page()
     page.goto(URL)
 
-    assert "the-internet" in page.title().lower()
-
     h1_text = page.locator("h1").inner_text()
+    assert "the-internet" in h1_text.lower()
+
     print(f"✅ Сайт доступен. Заголовок: {h1_text}")
+
+    current_url = navigate_to_example(page, "Form Authentication")
+
+    assert "/login" in current_url, "Не тот URL"
+
+    print(f"Перешли в: Form Authentication | URL: {current_url}")
 
     browser.close()
