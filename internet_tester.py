@@ -31,4 +31,19 @@ with sync_playwright() as p:
     assert "/login" in page.url
     print(f"✅ Успешный выход! URL: {page.url}")
 
+    current_url = navigate_to_example(page, "Checkboxes")
+    checkboxes = page.locator("input[type='checkbox']")
+
+    checkbox1 = checkboxes.first
+    checkbox2 = checkboxes.nth(1)
+
+    print(f"Checkbox 1: {checkbox1.is_checked()}")
+    print(f"Checkbox 2: {checkbox2.is_checked()}")
+
+    checkbox1.check()
+    checkbox2.uncheck()
+
+    print(f"✅ Checkbox 1: checked={checkbox1.is_checked()}")
+    print(f"✅ Checkbox 2: checked={checkbox2.is_checked()}")
+
     browser.close()
