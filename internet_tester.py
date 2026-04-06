@@ -1,4 +1,4 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright,expect
 
 URL = "https://the-internet.herokuapp.com/"
 
@@ -31,6 +31,7 @@ with sync_playwright() as p:
     assert "/login" in page.url
     print(f"✅ Успешный выход! URL: {page.url}")
 
+    page.goto(URL)
     current_url = navigate_to_example(page, "Checkboxes")
     checkboxes = page.locator("input[type='checkbox']")
 
@@ -45,5 +46,19 @@ with sync_playwright() as p:
 
     print(f"✅ Checkbox 1: checked={checkbox1.is_checked()}")
     print(f"✅ Checkbox 2: checked={checkbox2.is_checked()}")
+
+    page.goto(URL)
+    navigate_to_example(page, "Dropdown")
+    dropdown = page.locator("#dropdown")
+    expect(dropdown).to_have_value("")
+
+    dropdown.select_option(label="Option 1")
+    expect(dropdown).to_have_value("1")
+
+    dropdown.select_option(value="2")
+    expect(dropdown).to_have_value("2")
+
+    selected_text = page.locator("#dropdown option:checked").inner_text()
+    print(f"✅ Выбрано: {selected_text}")
 
     browser.close()
