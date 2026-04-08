@@ -61,4 +61,14 @@ with sync_playwright() as p:
     selected_text = page.locator("#dropdown option:checked").inner_text()
     print(f"✅ Выбрано: {selected_text}")
 
+
+    page.goto(URL)
+    navigate_to_example(page, "Inputs")
+    input_number = page.locator("input[type='number']")
+    input_number.fill("123")
+    assert input_number.input_value() == "123"
+    input_number.clear()
+    input_number.fill("456")
+    print(f"✅Введено: {input_number.input_value()}")
+
     browser.close()
