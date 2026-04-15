@@ -1,3 +1,4 @@
+from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 
 URL = "https://the-internet.herokuapp.com/"
@@ -7,7 +8,7 @@ def navigate_to_example(page, example_name: str) -> str:
     return page.url
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False)
+    browser = p.chromium.launch(headless=False, slow_mo=2000)
     page = browser.new_page()
     page.goto(URL)
 
@@ -70,5 +71,46 @@ with sync_playwright() as p:
     input_number.clear()
     input_number.fill("456")
     print(f"✅Введено: {input_number.input_value()}")
+
+
+    page.goto(URL)
+    page.get_by_role("link", name="Hovers").click()
+    avatar = page.locator(".figure").first
+    avatar.hover()
+    tooltip = avatar.locator(".figcaption")
+    expect(tooltip).to_be_visible()
+    expect(tooltip).to_contain_text("name: user1")
+    print(f"✅ Навели на изображение. Текст: name: user1")
+
+
+    page.goto(URL)
+    page.get_by_role("link", name="JavaScript Alerts").click()
+    page.on("dialog", lambda dialog: dialog.accept())
+    page.get_by_role("button", name="Click for JS Alert").click()
+    result = page.locator("#result")
+    expect(result).to_have_text("You successfully clicked an alert")
+
+    print(f"✅ Alert принят. Сообщение: You successfully clicked an alert")
+
+
+    page.goto(URL)
+    page.get_by_role("link", name="File Upload").click()
+    test_file = Path("../test_upload.txt")
+    test_file.write_text("Hello Playwright")
+    page.locator("#file-upload").set_input_files(test_file)
+    page.locator("#file-submit").click()
+    uploaded = page.locator("#uploaded-files")
+    expect(uploaded).to_have_text("test_upload.txt")
+
+    print(f"✅ Файл загружен: test_upload.txt")
+
+    page.goto(URL)
+    page.get_by_role("link", name="Dynamic Loading").click()
+    page.get_by_role("link", name="Example 1: Element on page that is hidden").click()
+    page.get_by_role("button", name="Start").click()
+    page.wait_for_selector("#finish h4")
+    expect(page.locator("#finish h4")).to_have_text("Hello World!")
+
+    print(f"✅ Элемент появился: Hello World!")
 
     browser.close()
