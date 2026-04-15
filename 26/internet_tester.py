@@ -8,7 +8,7 @@ def navigate_to_example(page, example_name: str) -> str:
     return page.url
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False,slow_mo=2000)
+    browser = p.chromium.launch(headless=False, slow_mo=2000)
     page = browser.new_page()
     page.goto(URL)
 
